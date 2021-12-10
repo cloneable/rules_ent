@@ -1,0 +1,18 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
+
+go_library(
+    name = "generate_lib",
+    srcs = ["main.go"],
+    importpath = "github.com/cloneable/rules_ent/cmd/generate",
+    visibility = ["//visibility:private"],
+    deps = [
+        "@io_entgo_ent//entc",
+        "@io_entgo_ent//entc/gen",
+    ],
+)
+
+go_binary(
+    name = "generate",
+    embed = [":generate_lib"],
+    visibility = ["//visibility:public"],
+)

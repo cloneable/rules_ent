@@ -1,0 +1,11 @@
+workspace(name = "com_github_cloneable_rules_ent")
+
+# load("@com_github_cloneable_rules_ent//:repositories.bzl", "ent_go_repositories")
+
+# ent_go_repositories()
+
+# load("@com_github_cloneable_rules_ent//:deps.bzl", "ent_go_dependencies")
+
+# ent_go_dependencies()
+
+#gazelle:repository_macro deps.bzl%ent_go_dependencies
