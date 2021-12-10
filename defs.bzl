@@ -35,7 +35,7 @@ def _go_ent_library_impl(ctx):
     schema_path = "./" + ctx.attr.schema.label.package
     schema_package = ctx.attr.schema.label.name
     target_path = outputs[0].dirname  # TODO: better/cleaner way?
-    target_package = ctx.label.name
+    target_package = ctx.attr.importpath
 
     ctx.actions.run_shell(
         mnemonic = "EntGenerate",
