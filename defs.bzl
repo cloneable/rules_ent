@@ -44,7 +44,6 @@ def _go_ent_library_impl(ctx):
         set -eu
 
         export PATH="$(pwd)/{gobin}:$PATH"
-        export GOROOT="$(pwd)/$GOROOT"
         export GOCACHE="$(pwd)/.gocache"
         export GOPATH="$(pwd)/.gopath"
 
@@ -58,7 +57,7 @@ def _go_ent_library_impl(ctx):
         tools = [ctx.executable._generate] + go.sdk_tools + go.sdk_files,
         inputs = depset(ctx.files.deps + ctx.attr.schema[GoSource].srcs),
         outputs = outputs,
-        env = go.env,
+        env = {"GOROOT_FINAL": "GOROOT"},
     )
 
     # TODO: Generate go_library() for each package. Can gazelle do that?
