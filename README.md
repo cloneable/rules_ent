@@ -2,7 +2,7 @@
 
 Bazel rules for Ent code generation
 
-[WIP]
+> **[WIP; still very hacky]**
 
 ## Usage
 
@@ -31,10 +31,10 @@ load("@com_github_cloneable_rules_ent//:defs.bzl", "go_ent_library")
 go_ent_library(
     name = "ent",
     entities = ["entity"],        # temporarily needed
+    gomod = "//:go_mod",          # hopefully only temporarily needed
+    importpath = "github.com/cloneable/repo/target/package/ent",
     schema = "//path/to/schema",  # go_library of schema package
-    deps = [
-        "//:go_mod",
-    ],
+    visibility = ["//:__subpackages__"],
 )
 ```
 
