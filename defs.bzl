@@ -5,7 +5,7 @@ def _go_ent_library_impl(ctx):
 
     # TODO: Discuss single-file output with Ent maintainers.
 
-    outputs = []
+    files = []
     for f in [
         "client",
         "config",
@@ -13,24 +13,29 @@ def _go_ent_library_impl(ctx):
         "mutation",
         "runtime",
         "tx",
-        # TODO: declare subdirs.
-        # "enttest/enttest",
-        # "hook/hook",
-        # "migrate/migrate",
-        # "migrate/schema",
-        # "predicate/predicate",
-        # "runtime/runtime",
+        "enttest/enttest",
+        "hook/hook",
+        "migrate/migrate",
+        "migrate/schema",
+        "predicate/predicate",
+        "runtime/runtime",
     ]:
-        outputs.append(ctx.actions.declare_file(f + ".go"))
+        files.append(f + ".go")
 
     # TODO: get entity names from schema.
     for entity in ctx.attr.entities:
         for suffix in ["", "_create", "_delete", "_query", "_update"]:
-            outputs.append(ctx.actions.declare_file(entity + suffix + ".go"))
+            files.append(entity + suffix + ".go")
+        files.append(entity + "/" + entity + ".go")
+        files.append(entity + "/where.go")
 
-        # TODO: declare subdirs.
-        # outputs.append(ctx.actions.declare_file(entity + "/" + entity + ".go"))
-        # outputs.append(ctx.actions.declare_file(entity + "/where.go"))
+    libraries = {}
+    outputs = []
+    for f in files:
+        outfile = ctx.actions.declare_file(f)
+        outputs.append(outfile)
+        (dir, _, _) = f.rpartition("/")
+        libraries.setdefault(dir, []).append(outfile)
 
     schema_path = "./" + ctx.attr.schema.label.package
     schema_package = ctx.attr.schema.label.name
@@ -60,7 +65,12 @@ def _go_ent_library_impl(ctx):
         env = {"GOROOT_FINAL": "GOROOT"},
     )
 
-    library = go.new_library(go, srcs = outputs, deps = ctx.attr.deps + [ctx.attr.schema])
+    for dirname, files in libraries.items():
+        if dirname:
+            # TODO: Generate sublibraries
+            pass
+
+    library = go.new_library(go, srcs = libraries[""], deps = ctx.attr.deps + [ctx.attr.schema])
     source = go.library_to_source(go, ctx.attr, library, ctx.coverage_instrumented())
     archive = go.archive(go, source = source)
 
