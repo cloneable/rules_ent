@@ -130,7 +130,7 @@ _ent_generate = rule(
     toolchains = ["@io_bazel_rules_go//go:toolchain"],
 )
 
-def _go_ent_library_impl(ctx):
+def _ent_library_impl(ctx):
     go = go_context(ctx)
     ent = ctx.attr.ent_generate[EntGenerateInfo]
 
@@ -149,8 +149,8 @@ def _go_ent_library_impl(ctx):
         compilation_outputs = [archive.data.file],
     )]
 
-go_ent_library = rule(
-    implementation = _go_ent_library_impl,
+_ent_library = rule(
+    implementation = _ent_library_impl,
     attrs = {
         "importpath": attr.string(mandatory = True),
         "entlib": attr.string(),
@@ -173,7 +173,7 @@ go_ent_library = rule(
     toolchains = ["@io_bazel_rules_go//go:toolchain"],
 )
 
-def go_ent_macro(name, gomod, entities, schema, visibility, importpath):
+def go_ent_library(name, gomod, entities, schema, visibility, importpath):
     # TODO: handle potential name conflicts.
     _ent_generate(
         name = name + "_generate",
@@ -212,7 +212,7 @@ def go_ent_macro(name, gomod, entities, schema, visibility, importpath):
             ":" + name + "_predicate",
         ] + default_deps
 
-    go_ent_library(
+    _ent_library(
         name = name,
         ent_generate = ":" + name + "_generate",
         importpath = importpath,
@@ -223,7 +223,7 @@ def go_ent_macro(name, gomod, entities, schema, visibility, importpath):
         ] + default_deps + [":" + name + "_" + entity for entity in entities],
     )
     for libname, deps in libdeps.items():
-        go_ent_library(
+        _ent_library(
             name = name + "_" + libname,
             entlib = libname,
             ent_generate = ":" + name + "_generate",
