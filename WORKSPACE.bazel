@@ -4,6 +4,12 @@ workspace(name = "com_github_cloneable_rules_ent")
 
 # ent_go_repositories()
 
+# load("@io_bazel_rules_go//go:deps.bzl", "go_register_toolchains", "go_rules_dependencies")
+
+# go_rules_dependencies()
+
+# go_register_toolchains(version = "host")
+
 # load("@com_github_cloneable_rules_ent//:deps.bzl", "ent_go_dependencies")
 
 # ent_go_dependencies()
