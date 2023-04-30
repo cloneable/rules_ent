@@ -4,6 +4,7 @@ workspace(name = "com_github_cloneable_rules_ent")
 
 # ent_go_repositories()
 
+<<<<<<< HEAD
 # load("@io_bazel_rules_go//go:deps.bzl", "go_register_toolchains", "go_rules_dependencies")
 
 # go_rules_dependencies()
@@ -11,7 +12,42 @@ workspace(name = "com_github_cloneable_rules_ent")
 # go_register_toolchains(version = "host")
 
 # load("@com_github_cloneable_rules_ent//:deps.bzl", "ent_go_dependencies")
+=======
+# gazelle:repository_macro deps.bzl%ent_go_dependencies
+>>>>>>> 281959a (Add example that reproduces proto issue)
 
-# ent_go_dependencies()
+load("//:workspace.bzl", "install_workspace_dependencies")
 
-#gazelle:repository_macro deps.bzl%ent_go_dependencies
+install_workspace_dependencies()
+
+load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive", "http_file")
+
+# Gazelle -- (for the example)
+
+# gazelle:repo bazel_gazelle
+load("@bazel_gazelle//:deps.bzl", "gazelle_dependencies", "go_repository")
+
+
+# Protobuf -- (for the example)
+load("@com_google_protobuf//:protobuf_deps.bzl", "protobuf_deps")
+
+protobuf_deps()
+
+load("@rules_proto//proto:repositories.bzl", "rules_proto_dependencies", "rules_proto_toolchains")
+
+rules_proto_dependencies()
+
+rules_proto_toolchains()
+
+# Go -- (for the example)
+
+load("@io_bazel_rules_go//go:deps.bzl", "go_register_toolchains", "go_rules_dependencies")
+
+go_rules_dependencies()
+
+go_register_toolchains(version = "1.19.5")
+
+# Ent -- (for the example)
+load("@com_github_cloneable_rules_ent//:deps.bzl", "ent_go_dependencies")
+
+ent_go_dependencies()
