@@ -1,4 +1,4 @@
-load("@io_bazel_rules_go//go:def.bzl", "GoSource", "go_context")
+load("@io_bazel_rules_go//go:def.bzl", "GoSource", "GoPath", "go_context", "go_path")
 
 EntGenerateInfo = provider(
     "Ent schema generation info",
@@ -21,8 +21,6 @@ def _ent_generate_impl(ctx):
     files = []
     for f in [
         "client",
-        "config",
-        "context",
         "ent",
         "mutation",
         "runtime",
@@ -54,8 +52,13 @@ def _ent_generate_impl(ctx):
         else:
             libraries.setdefault("ent", []).append(outfile)
 
+    schema_srcs = []
+    for pkg in ctx.attr.gopath[GoPath].packages:
+        for src in pkg.srcs:
+            schema_srcs.append(src)
+
     schema_path = "./" + ctx.attr.schema.label.package
-    schema_package = ctx.attr.schema.label.name
+    schema_package = ctx.attr.schema[GoSource].library.importpath
     target_path = outputs[0].dirname  # TODO: better/cleaner way?
     target_package = ctx.attr.importpath
 
@@ -77,7 +80,7 @@ def _ent_generate_impl(ctx):
         arguments = [schema_path, schema_package, target_path, target_package],
         # TODO: check rules_go again what tools are really needed here.
         tools = [ctx.executable._generate] + go.sdk_tools + go.sdk_files,
-        inputs = depset(ctx.files.gomod + ctx.attr.schema[GoSource].srcs),
+        inputs = depset(ctx.files.gomod + schema_srcs),
         outputs = outputs,
         env = {"GOROOT_FINAL": "GOROOT"},
     )
@@ -112,6 +115,7 @@ _ent_generate = rule(
         "_go_context_data": attr.label(
             default = Label("@io_bazel_rules_go//:go_context_data"),
         ),
+        "gopath": attr.label(),
         "importpath": attr.string(mandatory = True),
         "deps": attr.label_list(
             default = [
@@ -175,12 +179,17 @@ _ent_library = rule(
 
 def go_ent_library(name, gomod, entities, schema, visibility, importpath):
     # TODO: handle potential name conflicts.
+    go_path(
+        name = name + "_gopath",
+        deps = [schema],
+    )
     _ent_generate(
         name = name + "_generate",
         entities = entities,
         schema = schema,
         gomod = gomod,
         importpath = importpath,
+        gopath = ":" + name + "_gopath",
     )
 
     default_deps = [
