@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package user_settings;
+
+message UserSettings {
+    bool color_blind = 1;
+    AppLanguage lang = 2;
+}
+
+enum AppLanguage {
+    ENGLISH = 0;
+    FRENCH = 1;
+    PORTUGUESE = 2;
+}
